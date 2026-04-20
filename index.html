@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI 64 進階人格特質測驗</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --bg-color: #f9f9fb;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); display: flex; justify-content: center; padding: 20px; }
+        #quiz-container { background: white; max-width: 600px; width: 100%; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .progress-bar { height: 10px; background: #eee; border-radius: 5px; margin-bottom: 20px; }
+        .progress-fill { height: 100%; background: var(--primary-color); width: 0%; transition: 0.3s; border-radius: 5px; }
+        .question { font-size: 1.2rem; margin-bottom: 20px; font-weight: bold; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        button:hover { background: #f0edff; border-color: var(--primary-color); }
+        #result { display: none; text-align: center; }
+        .type-code { font-size: 3rem; color: var(--primary-color); font-weight: 800; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="quiz-box">
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+        <div id="question-text" class="question">正在載入題目...</div>
+        <div class="options" id="options-container">
+            </div>
+    </div>
+
+    <div id="result">
+        <h2>你的測驗結果是</h2>
+        <div class="type-code" id="mbti-result"></div>
+        <p id="type-description"></p>
+        <button onclick="location.reload()">重新測驗</button>
+    </div>
+</div>
+
+<script>
+    // 範例題庫 (根據 64 人格邏輯，需涵蓋多個維度)
+    const questions = [
+        { text: "在社交聚會中，你通常是：", options: [
+            { text: "主動與陌生人交談 (E)", score: { E: 1 } },
+            { text: "待在熟悉的朋友身邊 (I)", score: { I: 1 } }
+        ]},
+        { text: "你更傾向於關注：", options: [
+            { text: "當下的細節與事實 (S)", score: { S: 1 } },
+            { text: "未來的可能性與想像 (N)", score: { N: 1 } }
+        ]},
+        { text: "做決策時，你較看重：", options: [
+            { text: "邏輯與客觀分析 (T)", score: { T: 1 } },
+            { text: "人情味與價值觀 (F)", score: { F: 1 } }
+        ]},
+        { text: "你的生活風格傾向：", options: [
+            { text: "有計畫且井然有序 (J)", score: { J: 1 } },
+            { text: "隨性且保持彈性 (P)", score: { P: 1 } }
+        ]}
+        // 這裡可以繼續添加題目，直到達到所需的精準度
+    ];
+
+    let currentIdx = 0;
+    let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+    function showQuestion() {
+        if (currentIdx >= questions.length) {
+            showResult();
+            return;
+        }
+        
+        const q = questions[currentIdx];
+        document.getElementById('question-text').innerText = q.text;
+        const optionsDiv = document.getElementById('options-container');
+        optionsDiv.innerHTML = '';
+        
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = opt.text;
+            btn.onclick = () => nextQuestion(opt.score);
+            optionsDiv.appendChild(btn);
+        });
+
+        document.getElementById('progress').style.width = (currentIdx / questions.length) * 100 + '%';
+    }
+
+    function nextQuestion(score) {
+        for (let key in score) {
+            scores[key] += score[key];
+        }
+        currentIdx++;
+        showQuestion();
+    }
+
+    function showResult() {
+        document.getElementById('quiz-box').style.display = 'none';
+        const resDiv = document.getElementById('result');
+        resDiv.style.display = 'block';
+
+        let result = "";
+        result += scores.E >= scores.I ? "E" : "I";
+        result += scores.S >= scores.N ? "S" : "N";
+        result += scores.T >= scores.F ? "T" : "F";
+        result += scores.J >= scores.P ? "J" : "P";
+
+        // 64人格延伸邏輯：這裡可以加上額外的後綴（如 -A / -T 或子分類）
+        document.getElementById('mbti-result').innerText = result;
+        document.getElementById('type-description').innerText = "你是典型的 " + result + " 型人格。這是一個初步的演示結果。";
+    }
+
+    showQuestion();
+</script>
+
+</body>
+</html>
